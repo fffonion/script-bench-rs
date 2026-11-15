@@ -27,9 +27,9 @@ fn bench_mode(c: &mut Criterion, mode: ExecMode, count: usize) {
     script_bench::rustscript::sort_userdata_with_len(
         mode,
         count,
-        |func| {
+        |mut func| {
             c.bench_function(mode.label(), |b| {
-                b.iter(|| func());
+                b.iter(&mut func);
             });
         },
         |array| {
