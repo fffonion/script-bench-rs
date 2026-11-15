@@ -1,0 +1,79 @@
+fn rand(n: int) -> int;
+fn data_new(text: string) -> string;
+fn data_lt(left: string, right: string) -> bool;
+
+let charset: [string] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+let mut array: [string] = [];
+let mut i = 0;
+while i < 10000 {
+    let mut text = "";
+    let target_len = 8 + rand(16);
+    let mut char_index = 0;
+    while char_index < target_len {
+        text = text + charset[rand(charset.length)].copy();
+        char_index = char_index + 1;
+    }
+    array[array.length] = data_new(text);
+    i = i + 1;
+}
+
+let mut ranges: [int] = [];
+let mut top = 0;
+ranges[top] = 0;
+ranges[top + 1] = array.length - 1;
+top = top + 2;
+while top > 0 {
+    top = top - 2;
+    let lo = ranges[top].copy();
+    let hi = ranges[top + 1].copy();
+    if lo < hi {
+        let pivot_index = (lo + hi) / 2;
+        let pivot = array[pivot_index].copy();
+        let pivot_swap = array[pivot_index].copy();
+        array[pivot_index] = array[hi].copy();
+        array[hi] = pivot_swap;
+
+        let mut j = lo;
+        let mut scan = lo;
+        while scan < hi {
+            if data_lt(array[scan].copy(), pivot.copy()) {
+                let inner_swap = array[scan].copy();
+                array[scan] = array[j].copy();
+                array[j] = inner_swap;
+                j = j + 1;
+            }
+            scan = scan + 1;
+        }
+
+        let final_swap = array[j].copy();
+        array[j] = array[hi].copy();
+        array[hi] = final_swap;
+
+        let left_hi = j - 1;
+        let right_lo = j + 1;
+        if left_hi - lo > hi - right_lo {
+            if lo < left_hi {
+                ranges[top] = lo;
+                ranges[top + 1] = left_hi;
+                top = top + 2;
+            }
+            if right_lo < hi {
+                ranges[top] = right_lo;
+                ranges[top + 1] = hi;
+                top = top + 2;
+            }
+        } else {
+            if right_lo < hi {
+                ranges[top] = right_lo;
+                ranges[top + 1] = hi;
+                top = top + 2;
+            }
+            if lo < left_hi {
+                ranges[top] = lo;
+                ranges[top + 1] = left_hi;
+                top = top + 2;
+            }
+        }
+    }
+}
+array;
